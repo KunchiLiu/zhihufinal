@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="zh" class="no-js">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700' rel='stylesheet' type='text/css'>
+
+	<link rel="stylesheet" href="/static/css/reset.css"> <!-- CSS reset -->
+	<link rel="stylesheet" href="/static/css/style.css"> <!-- Resource style -->
+    <script src="/static/js/modernizr.js"></script> <!-- Modernizr -->
+	<script>
+	function CloseDiv(answer_div)
+		{
+			document.getElementById(answer_div).style.display='none';
+		};</script>
+</head>
+<body>
+<header>
+	<h1>知乎首页</h1>
+</header>
+<div class="wrapper">
+  <p style="font-size:20px; text-align:left;padding-top:10px;padding-left:20px;"><a href="#" onClick="document.getElementById('light').style.display='block';document.getElementById('fade').style.display='block'">提问</a>
+	  <a href="/logout"  type="button " >退出登陆</a>
+	  <a onClick="document.getElementById('user').style.display='block';document.getElementById('fade1').style.display='block';" style="cursor:pointer;">个人中心</a>
+  </p>
+	<div id="user" class="white_content1">
+		<div   id="user_close" onClick="document.getElementById('user').style.display='none';document.getElementById('fade1').style.display='none'" ></div>
+		<p style="font-size:19px;position:relative;top:-15px;">用户名：</p><p style="font-size:19px;position:relative;top:-15px;color:#2894FF;">{{userprofile.user.username}}</p>
+		<p style="font-size:19px;position:relative;top:-15px;">我的关注：</p>
+		{% for aquestion in myfollowquestions %}
+        <form method="POST" action="/follow/">
+            {% csrf_token %}
+            <input type="hidden" name="followquestionid" value="{{aquestion.id}}">
+		<button type="submit" class="followhref">{{aquestion.content}}</button>
+            </form>
+		{% endfor %}
+		<p style="font-size:19px;position:relative;top:-15px;">我提的问题：</p>
+		{% for anotherquestion in questionlist %}
+        <form method="POST" action="/follow/">
+            {% csrf_token %}
+            <input type="hidden" name="followquestionid" value="{{anotherquestion.id}}">
+		<button type="submit" class="followhref">{{anotherquestion.content}}</button>
+            </form>
+		{% endfor %}
+	</div>
+		<div id="fade1" class="black_overlay" style="display:none;"></div>
+	<p class="alert" ></p>
+		{% ifequal userprofile.prompt 1 %}
+		<form method="POST" action="/data/">
+			{% csrf_token %}
+			<input type="submit" class="info_input" value="  "/>
+		</form>
+		{% endifequal %}
+  <div id="light" class="white_content">
+	  <div  id="ask_close" onClick="document.getElementById('light').style.display='none';document.getElementById('fade').style.display='none'" ></div>
+  <form  method="POST" action="/questionlist/">
+	  {% csrf_token %}
+      <p style="font-size:20px;position:relative;top:-30px;width:200px;">请选择问题分类</p>
+	  <label for="education" style="font-size:19px;position:relative;top:-15px;">教育</label>
+	  <input type="radio" name="category" id="education" value="education" style="font-size:19px;position:relative;top:-15px;"/>
+	  <label for="tech" style="font-size:19px;position:relative;top:-15px;">科技</label>
+	  <input type="radio" name="category" id="tech" value="technology" style="font-size:19px;position:relative;top:-15px;"/>
+	  <label for="sports" style="font-size:19px;position:relative;top:-15px;">体育</label>
+	  <input type="radio" name="category" id="sports" value="sports" style="font-size:19px;position:relative;top:-15px;"/>
+	  <label for="history" style="font-size:19px;position:relative;top:-15px;">历史</label>
+	  <input type="radio" name="category" id="history" value="history" style="font-size:19px;position:relative;top:-15px;"/>
+	  <label for="music" style="font-size:19px;position:relative;top:-15px;">音乐</label>
+	  <input type="radio" name="category" id="music" value="music" style="font-size:19px;position:relative;top:-15px;"/>
+	  <label for="life" style="font-size:19px;position:relative;top:-15px;">生活</label>
+	  <input type="radio" name="category" id="life" value="life" style="font-size:19px;position:relative;top:-15px;"/>
+	  <br>
+		<textarea class="ask_input" name="myask" style="font-size:20px;" placeholder="写问题..."></textarea>
+      <button type="submit" id="ask_submit" >提交问题</button>
+	</form>
+  </div>
+  <div id="fade" class="black_overlay" style="display:none;"></div>
+</div>
+<section class="cd-faq">
+	<ul class="cd-faq-categories">
+		<li><a class="selected" href="#basics">教育</a></li>
+		<li><a href="#mobile">科技</a></li>
+		<li><a href="#account">体育</a></li>
+		<li><a href="#payments">历史</a></li>
+		<li><a href="#privacy">音乐</a></li>
+		<li><a href="#delivery">生活</a></li>
+	</ul> <!-- cd-faq-categories -->
+
+	<div class="cd-faq-items">
+
+        <ul id="basics" class="cd-faq-group">
+			<li class="cd-faq-title"><h2>热点</h2></li>
+			<li>
+				{% for onequestion in hotquestions %}
+                <a class="cd-faq-trigger">{{onequestion.content}}</a>
+					<div class="cd-faq-content">
+                {% for oneanswer in answers %}
+				{% if  oneanswer.question_id == onequestion.id  %}
+				<a class="cd-faq-trigger">{{oneanswer.content|safe}}</a>
+                {% endif %}
+				{% endfor %}
+                        <a  href="/question/?sendid={{ onequestion.id }}" style="font-size:15px;"> 点击查看答案</a></div>
+				{% endfor %}
+			</li>
+		</ul> <!-- cd-faq-group -->
+
+		<ul id="basics" class="cd-faq-group">
+			<li class="cd-faq-title"><h2>教育</h2></li>
+			<li>
+				{% for onequestion in questions %}
+				{% ifequal onequestion.type "education"  %}
+                <a class="cd-faq-trigger">{{onequestion.content}}</a>
+					<div class="cd-faq-content">
+				<a  href="/question/?sendid={{ onequestion.id }}" style="font-size:15px;"> 点击查看答案</a></div>
+				{% endifequal %}
+				{% endfor %}
+			</li>
+		</ul> <!-- cd-faq-group -->
+
+		<ul id="mobile" class="cd-faq-group">
+			<li class="cd-faq-title"><h2>科技</h2></li>
+			<li>
+				{% for onequestion in questions %}
+				{% ifequal onequestion.type "technology"  %}
+				<a class="cd-faq-trigger" href="/static/#0">{{onequestion.content}}</a>
+				<div class="cd-faq-content">
+				<a  href="/question/?sendid={{ onequestion.id }}" style="font-size:15px;"> 点击查看答案</a></div><!-- cd-faq-content -->
+				{% endifequal %}
+				{% endfor %}
+			</li>
+		</ul> <!-- cd-faq-group -->
+
+		<ul id="account" class="cd-faq-group">
+			<li class="cd-faq-title"><h2>体育</h2></li>
+			<li>
+				{% for onequestion in questions %}
+				{% ifequal onequestion.type "sports"  %}
+				<a class="cd-faq-trigger" href="/static/#0">{{onequestion.content}}</a>
+				<div class="cd-faq-content">
+				<a  href="/question/?sendid={{ onequestion.id }}" style="font-size:15px;"> 点击查看答案</a></div>
+				<!-- cd-faq-content -->
+				{% endifequal %}
+				{% endfor %}
+			</li>
+		</ul> <!-- cd-faq-group -->
+
+		<ul id="payments" class="cd-faq-group">
+			<li class="cd-faq-title"><h2>历史</h2></li>
+			<li>
+				{% for onequestion in questions %}
+				{% ifequal onequestion.type "history"  %}
+				<a class="cd-faq-trigger" href="/static/#0">{{onequestion.content}}</a>
+				<div class="cd-faq-content">
+				<a  href="/question/?sendid={{ onequestion.id }}" style="font-size:15px;"> 点击查看答案</a></div><!-- cd-faq-content -->
+				{% endifequal %}
+				{% endfor %}
+			</li>
+		</ul> <!-- cd-faq-group -->
+
+		<ul id="privacy" class="cd-faq-group">
+			<li class="cd-faq-title"><h2>音乐</h2></li>
+			<li>
+				{% for onequestion in questions %}
+				{% ifequal onequestion.type "music"  %}
+				<a class="cd-faq-trigger" href="/static/#0">{{onequestion.content}}</a>
+				<div class="cd-faq-content">
+				<a  href="/question/?sendid={{ onequestion.id }}" style="font-size:15px;"> 点击查看答案</a></div><!-- cd-faq-content -->
+				{% endifequal %}
+				{% endfor %}
+			</li>
+		</ul> <!-- cd-faq-group -->
+
+		<ul id="delivery" class="cd-faq-group">
+			<li class="cd-faq-title"><h2>生活</h2></li>
+			<li>
+				{% for onequestion in questions %}
+				{% ifequal onequestion.type "life"  %}
+				<a class="cd-faq-trigger" href="/static/#0">{{onequestion.content}}</a>
+				<div class="cd-faq-content">
+				<a  href="/question/?sendid={{ onequestion.id }}" style="font-size:15px;"> 点击查看答案</a>
+				</div> <!-- cd-faq-content -->
+				{% endifequal %}
+				{% endfor %}
+			</li>
+		</ul> <!-- cd-faq-group -->
+	</div> <!-- cd-faq-items -->
+</section> <!-- cd-faq -->
+<script src="/static/js/jquery-2.1.0.min.js"></script>
+<script src="/static/js/jquery.mobile.custom.min.js"></script>
+<script src="/static/js/main.js"></script> <!-- Resource jQuery -->
+</body>
+</html>

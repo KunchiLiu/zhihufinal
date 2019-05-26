@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh" class="no-js">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="/static/css/reset.css"> <!-- CSS reset -->
+	<link rel="stylesheet" href="/static/css/style.css"> <!-- Resource style -->
+	<script src="/static/js/modernizr.js"></script> <!-- Modernizr -->
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>   <!-- 富文本 -->
+    <script type="text/javascript" src="/static/myEditor/release/myEditor.js"></script>
+	<script type="text/javascript">
+		function ShowDiv(answer_div){
+			document.getElementById(answer_div).style.display='block';
+		};
+		function CloseDiv(answer_div)
+		{
+			document.getElementById(answer_div).style.display='none';
+		};
+    </script>
+     <!-- 注意， 只需要引用 JS，无需引用任何 CSS ！！！-->
+
+</head>
+<body>
+<header>
+	<h1>问题详情</h1>
+</header>
+<div id="answer_div" class="answer_div">
+	<div class="answer_div_header">
+		<div style="padding-left:20px;padding-top:17px;">
+        <h4 style='font-family:楷体;'>{{"欢迎你，"}} {{user}} </h4>
+	</div>
+		<div class="answer_close" onclick="document.getElementById('answer_div').style.display='none';document.getElementById('fade').style.display='none'" ></div>
+	</div>
+	<hr class="divider"/>
+
+	<form class="answer_form" method="POST" action="/question/"  onsubmit="return answer()">
+		{% csrf_token %}
+        <div id="div1"></div>
+		<input type="hidden" name="id" value="{{question.id}}">
+        <div id = "div1">
+        </div>
+        <script type="text/javascript">
+            var E = window.wangEditor;
+            var editor = new E('#div1');
+            editor.customConfig.uploadImgShowBase64 = true ; // 使用 base64 保存图片
+            editor.customConfig.showLinkImg = false;
+            editor.create();
+            function answer() {
+                var q = document.getElementById('myanswer');
+                q.value = editor.txt.html();
+                return true;
+            }
+    </script>
+        <input id="myanswer" name = "myanswer" type ="hidden">
+		<button type="submit" id="answer_submit" >提交回答</button>
+	</form>
+    </div>
+	<div id="fade" class="black_overlay" style="display:none;"></div>
+
+<div class="cd-faq-items">
+<a class="cd-faq-trigger" >{{question.content|safe}}
+	<a  onclick="document.getElementById('answer_div').style.display='block';document.getElementById('fade').style.display='block'" style="position:relative;left:30px;top:-10px;cursor:pointer;font-size:15px;"> 回答</a>
+	<form id="_form" method="post" action="/attention/">
+        {% csrf_token %}
+  <input type="hidden" name="questionid" value="{{question.id}}" />
+  <button type="submit"style="color:#a9c056;border:none;position:relative;left:30px;top:-10px;cursor:pointer;font-size:15px;">关注</button>
+    </form>
+</a>
+	{%for oneanswer in answers%}
+	<div id="originanswer_div" class="answerclass">
+	<p >{{oneanswer.content|safe}}</p>
+	<p >作者：{{oneanswer.author.username}}</p>
+	</div><br>
+	{% endfor %}
+</div>
+<script src="/static/js/jquery-2.1.0.min.js"></script>
+<script src="/static/js/jquery.mobile.custom.min.js"></script>
+<script src="/static/js/main.js"></script> <!-- Resource jQuery -->
+</body>
+</html>
