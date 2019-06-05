@@ -2,7 +2,7 @@
 
 网络编程课程作业
 
-##运行
+## 运行
 
 ```bash
 python3 manage.py runserver 
